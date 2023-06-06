@@ -3,7 +3,9 @@ import os
 import torch
 import logging
 
+import numpy as np
 import graphgps  # noqa, register custom modules
+import utils
 from graphgps.agg_runs import agg_runs
 from graphgps.optimizer.extra_optimizers import ExtendedSchedulerConfig
 
@@ -16,7 +18,7 @@ from torch_geometric.graphgym.logger import set_printing
 from torch_geometric.graphgym.optim import create_optimizer, \
     create_scheduler, OptimizerConfig
 from torch_geometric.graphgym.model_builder import create_model
-from torch_geometric.graphgym.train import GraphGymDataModule, train
+from torch_geometric.graphgym.train import GraphGymDataModule
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric.graphgym.utils.device import auto_select_device
 from torch_geometric.graphgym.register import train_dict
@@ -25,7 +27,7 @@ from torch_geometric import seed_everything
 from graphgps.finetuning import load_pretrained_model_cfg, \
     init_model_from_pretrained
 from graphgps.logger import create_logger
-
+from train import train
 
 torch.backends.cuda.matmul.allow_tf32 = True  # Default False in PyTorch 1.12+
 torch.backends.cudnn.allow_tf32 = True  # Default True
@@ -124,6 +126,7 @@ if __name__ == '__main__':
     # Set Pytorch environment
     torch.set_num_threads(cfg.num_threads)
     # Repeat for multiple experiment runs
+    total_time_list, avg_time_list = [], []
     for run_id, seed, split_index in zip(*run_loop_settings()):
         # Set configurations for each run
         custom_set_run_dir(cfg, run_id)
@@ -161,13 +164,21 @@ if __name__ == '__main__':
                 logging.warning("[W] WandB logging is not supported with the "
                                 "default train.mode, set it to `custom`")
             datamodule = GraphGymDataModule()
-            train(model, datamodule, logger=True)
+            total_time, avg_time = train(model, datamodule, logger=True)
         else:
-            train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
+            total_time, avg_time = train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
                                        scheduler)
+
+        total_time_list.append(total_time)
+        avg_time_list.append(avg_time)
     # Aggregate results from different seeds
     try:
+        cfg.statistics.total_time = np.mean(total_time_list)
+        cfg.statistics.total_time_std = np.std(total_time_list)
+        cfg.statistics.avg_time = np.mean(avg_time_list)
+        cfg.statistics.avg_time_std = np.std(avg_time_list)
         agg_runs(cfg.out_dir, cfg.metric_best)
+        utils.agg_runs_to_csv(cfg, cfg.out_dir, cfg.metric_best)
     except Exception as e:
         logging.info(f"Failed when trying to aggregate multiple runs: {e}")
     # When being launched in batch mode, mark a yaml as done

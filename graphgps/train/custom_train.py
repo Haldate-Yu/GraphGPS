@@ -11,6 +11,7 @@ from torch_geometric.graphgym.utils.epoch import is_eval_epoch, is_ckpt_epoch
 
 from graphgps.loss.subtoken_prediction_loss import subtoken_cross_entropy
 from graphgps.utils import cfg_to_dict, flatten_dict, make_wandb_name
+from utils import print_gpu_utilization
 
 
 def train_epoch(logger, loader, model, optimizer, scheduler, batch_accumulation):
@@ -112,6 +113,9 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
                          name=wandb_name)
         run.config.update(cfg_to_dict(cfg))
 
+    t0 = time.time()
+    per_epoch_time = []
+
     num_splits = len(loggers)
     split_names = ['val', 'test']
     full_epoch_times = []
@@ -121,7 +125,8 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
         train_epoch(loggers[0], loaders[0], model, optimizer, scheduler,
                     cfg.optim.batch_accumulation)
         perf[0].append(loggers[0].write_epoch(cur_epoch))
-
+        if cur_epoch == 1:
+            cfg.statistics.memory = utils.print_gpu_utilization(0)
         if is_eval_epoch(cur_epoch):
             for i in range(1, num_splits):
                 eval_epoch(loggers[i], loaders[i], model,
@@ -198,6 +203,7 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
                             gtl.attention.gamma.requires_grad:
                         logging.info(f"    {gtl.__class__.__name__} {li}: "
                                      f"gamma={gtl.attention.gamma.item()}")
+        per_epoch_time.append(time.time() - start_time)
     logging.info(f"Avg time per epoch: {np.mean(full_epoch_times):.2f}s")
     logging.info(f"Total train loop time: {np.sum(full_epoch_times) / 3600:.2f}h")
     for logger in loggers:
@@ -209,7 +215,12 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
         run.finish()
         run = None
 
+    total_time_taken = time.time() - t0
+    avg_time_epoch = np.mean(per_epoch_time)
+
     logging.info('Task done, results saved in %s', cfg.run_dir)
+
+    return total_time_taken, avg_time_epoch
 
 
 @register_train('inference-only')
@@ -281,11 +292,11 @@ def ogblsc_inference(loggers, loaders, model, optimizer=None, scheduler=None):
 
     # Check PCQM4Mv2 prediction targets.
     logging.info(f"0 ({split_names[0]}): {len(loaders[0].dataset)}")
-    assert(all([not torch.isnan(d.y)[0] for d in loaders[0].dataset]))
+    assert (all([not torch.isnan(d.y)[0] for d in loaders[0].dataset]))
     logging.info(f"1 ({split_names[1]}): {len(loaders[1].dataset)}")
-    assert(all([torch.isnan(d.y)[0] for d in loaders[1].dataset]))
+    assert (all([torch.isnan(d.y)[0] for d in loaders[1].dataset]))
     logging.info(f"2 ({split_names[2]}): {len(loaders[2].dataset)}")
-    assert(all([torch.isnan(d.y)[0] for d in loaders[2].dataset]))
+    assert (all([torch.isnan(d.y)[0] for d in loaders[2].dataset]))
 
     model.eval()
     for i in range(num_splits):
@@ -310,7 +321,7 @@ def ogblsc_inference(loggers, loaders, model, optimizer=None, scheduler=None):
                                            mode=split_names[i])
 
 
-@ register_train('log-attn-weights')
+@register_train('log-attn-weights')
 def log_attn_weights(loggers, loaders, model, optimizer=None, scheduler=None):
     """
     Customized pipeline to inference on the test set and log the attention

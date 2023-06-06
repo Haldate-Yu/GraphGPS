@@ -158,5 +158,6 @@ def agg_runs(dir, metric_best='auto'):
         dir_out = os.path.join(dir, 'agg', key)
         fname = os.path.join(dir_out, 'best.json')
         dict_to_json(value, fname)
+
     logging.info('Results aggregated across runs saved in {}'.format(
         os.path.join(dir, 'agg')))
