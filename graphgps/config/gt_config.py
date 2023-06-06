@@ -70,3 +70,16 @@ def set_cfg_gt(cfg):
     cfg.gt.bigbird.block_size = 3
 
     cfg.gt.bigbird.layer_norm_eps = 1e-6
+
+    # statistics argument group
+    cfg.statistics = CN()
+    # Memory Usage
+    cfg.statistics.memory = 0
+    # Total Time
+    cfg.statistics.total_time = 0.0
+    # Total Time Std
+    cfg.statistics.total_time_std = 0.0
+    # Avg Time
+    cfg.statistics.avg_time = 0.0
+    # Avg Time Std
+    cfg.statistics.avg_time_std = 0.0

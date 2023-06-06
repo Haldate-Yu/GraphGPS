@@ -1,4 +1,4 @@
-out_dir: tests/results
+out_dir: ./results
 metric_best: mae
 metric_agg: argmin
 wandb:
@@ -69,3 +69,9 @@ optim:
   reduce_factor: 0.5
   schedule_patience: 25
   min_lr: 1e-6
+statistics:
+  memory: 0
+  total_time: 0.0
+  total_time_std: 0.0
+  avg_time: 0.0
+  avg_time_std: 0.0

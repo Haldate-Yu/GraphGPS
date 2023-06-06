@@ -21,3 +21,16 @@ def set_cfg_gt(cfg):
     cfg.posenc_GraphormerBias.num_spatial_types = None
     cfg.posenc_GraphormerBias.num_in_degrees = None
     cfg.posenc_GraphormerBias.num_out_degrees = None
+
+    # statistics argument group
+    cfg.statistics = CN()
+    # Memory Usage
+    cfg.statistics.memory = 0
+    # Total Time
+    cfg.statistics.total_time = 0.0
+    # Total Time Std
+    cfg.statistics.total_time_std = 0.0
+    # Avg Time
+    cfg.statistics.avg_time = 0.0
+    # Avg Time Std
+    cfg.statistics.avg_time_std = 0.0
