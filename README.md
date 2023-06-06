@@ -21,9 +21,9 @@ Specifically *PyG v2.2* is required.
 conda create -n graphgps python=3.10
 conda activate graphgps
 
-conda install pytorch=1.13 torchvision torchaudio pytorch-cuda=11.7 -c pytorch -c nvidia
+conda install pytorch=1.13 torchvision torchaudio pytorch-cuda=11.6 -c pytorch -c nvidia
 conda install pyg=2.2 -c pyg -c conda-forge
-pip install pyg-lib -f https://data.pyg.org/whl/torch-1.13.0+cu117.html
+pip install pyg-lib -f https://data.pyg.org/whl/torch-1.13.0+cu116.html
 
 # RDKit is required for OGB-LSC PCQM4Mv2 and datasets derived from it.  
 conda install openbabel fsspec rdkit -c conda-forge
