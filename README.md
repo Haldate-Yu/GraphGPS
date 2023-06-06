@@ -141,3 +141,10 @@ If you find this work useful, please cite our NeurIPS 2022 paper:
   year={2022}
 }
 ```
+
+## 如何修改
+
+模型相关配置在configs/下进行修改；
+
+训练部分custom，需要在graphgps/下相应部分进行修改；
+尤其是给config文件中加额外词条时，需要分组、名字、数据类型一一对应。

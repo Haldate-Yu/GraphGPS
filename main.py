@@ -169,14 +169,17 @@ if __name__ == '__main__':
             total_time, avg_time = train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
                                        scheduler)
 
-        total_time_list.append(total_time)
-        avg_time_list.append(avg_time)
+        total_time_list.append(float(total_time))
+        avg_time_list.append(float(avg_time))
     # Aggregate results from different seeds
+    total_time_list = np.array(total_time_list)
+    avg_time_list = np.array(avg_time_list)
+    logging.info(f"{total_time_list.dtype}")
+    cfg.statistics.total_time = np.mean(total_time_list)
+    cfg.statistics.total_time_std = np.std(total_time_list)
+    cfg.statistics.avg_time = np.mean(avg_time_list)
+    cfg.statistics.avg_time_std = np.std(avg_time_list)
     try:
-        cfg.statistics.total_time = np.mean(total_time_list)
-        cfg.statistics.total_time_std = np.std(total_time_list)
-        cfg.statistics.avg_time = np.mean(avg_time_list)
-        cfg.statistics.avg_time_std = np.std(avg_time_list)
         agg_runs(cfg.out_dir, cfg.metric_best)
         utils.agg_runs_to_csv(cfg, cfg.out_dir, cfg.metric_best)
     except Exception as e:

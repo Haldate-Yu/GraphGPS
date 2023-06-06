@@ -40,7 +40,7 @@ gt:
   dim_hidden: 64
 statistics:
   memory: 0
-  total_time: 0
-  total_time_std: 0
-  avg_time: 0
-  avg_time_std: 0
+  total_time: 0.0
+  total_time_std: 0.0
+  avg_time: 0.0
+  avg_time_std: 0.0

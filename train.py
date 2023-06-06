@@ -4,10 +4,10 @@ import time
 import numpy as np
 import torch
 
-from graphgym.checkpoint import clean_ckpt, load_ckpt, save_ckpt
-from graphgym.config import cfg
-from graphgym.loss import compute_loss
-from graphgym.utils.epoch import is_ckpt_epoch, is_eval_epoch
+from torch_geometric.graphgym.checkpoint import clean_ckpt, load_ckpt, save_ckpt
+from torch_geometric.graphgym.config import cfg
+from torch_geometric.graphgym.loss import compute_loss
+from torch_geometric.graphgym.utils.epoch import is_ckpt_epoch, is_eval_epoch
 
 import utils
 
