@@ -222,6 +222,7 @@ class NodeEncoder(torch.nn.Module):
             use_graph_token: If True, adds the graph token to the incoming batch.
         """
         super().__init__()
+        # self.lin_input = torch.nn.Linear(node_features, embed_dim)
         self.in_degree_encoder = torch.nn.Embedding(num_in_degree, embed_dim)
         self.out_degree_encoder = torch.nn.Embedding(num_out_degree, embed_dim)
 

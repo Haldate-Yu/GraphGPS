@@ -89,12 +89,13 @@ class TypeDictNodeEncoder(torch.nn.Module):
 
         self.encoder = torch.nn.Embedding(num_embeddings=num_types,
                                           embedding_dim=emb_dim)
+        # self.encoder = torch.nn.Linear(num_types, emb_dim)
         # torch.nn.init.xavier_uniform_(self.encoder.weight.data)
 
     def forward(self, batch):
         # Encode just the first dimension if more exist
-        batch.x = self.encoder(batch.x[:, 0])
-
+        batch_input = batch.x[:, 0]
+        batch.x = self.encoder(batch_input)
         return batch
 
 

@@ -41,7 +41,7 @@ class MultiHeadAttention2Layer(nn.Module):
     """
 
     def __init__(self, gamma, in_dim, out_dim, num_heads, full_graph,
-                 fake_edge_emb, use_bias):
+                 fake_edge_emb, use_bias, use_edge):
         super().__init__()
 
         self.out_dim = out_dim
@@ -49,7 +49,10 @@ class MultiHeadAttention2Layer(nn.Module):
         self.gamma = nn.Parameter(torch.tensor(0.5, dtype=float),
                                   requires_grad=True)
         self.full_graph = full_graph
+        self.use_edge = use_edge
 
+        if not self.use_edge:
+            self.gen_edge_emb = fake_edge_emb
         self.Q = nn.Linear(in_dim, out_dim * num_heads, bias=use_bias)
         self.K = nn.Linear(in_dim, out_dim * num_heads, bias=use_bias)
         self.E = nn.Linear(in_dim, out_dim * num_heads, bias=use_bias)
@@ -107,11 +110,15 @@ class MultiHeadAttention2Layer(nn.Module):
             # Add messages along fake edges to destination nodes
             scatter(msg_2, fake_edge_index[1], dim=0, out=batch.wV, reduce='add')
 
-
     def forward(self, batch):
         Q_h = self.Q(batch.x)
         K_h = self.K(batch.x)
-        E = self.E(batch.edge_attr)
+        if self.use_edge:
+            E = self.E(batch.edge_attr)
+        else:
+            # fake_edge_attr = torch.full(size=(len(batch.edge_index[1]), self.in_dim), fill_value=0.01)
+            fake_edge_attr = self.gen_edge_emb(batch.edge_index.new_zeros(1))
+            E = self.E(fake_edge_attr.cuda())
 
         if self.full_graph:
             Q_2h = self.Q_2(batch.x)
@@ -152,7 +159,8 @@ class SAN2Layer(nn.Module):
     def __init__(self, gamma, in_dim, out_dim, num_heads, full_graph,
                  fake_edge_emb, dropout=0.0,
                  layer_norm=False, batch_norm=True,
-                 residual=True, use_bias=False):
+                 residual=True, use_bias=False,
+                 use_edge=True):
         super().__init__()
 
         self.in_channels = in_dim
@@ -168,7 +176,8 @@ class SAN2Layer(nn.Module):
                                                   num_heads=num_heads,
                                                   full_graph=full_graph,
                                                   fake_edge_emb=fake_edge_emb,
-                                                  use_bias=use_bias)
+                                                  use_bias=use_bias,
+                                                  use_edge=use_edge)
 
         self.O_h = nn.Linear(out_dim, out_dim)
 

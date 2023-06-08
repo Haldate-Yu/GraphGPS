@@ -126,7 +126,7 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
                     cfg.optim.batch_accumulation)
         perf[0].append(loggers[0].write_epoch(cur_epoch))
         if cur_epoch == 1:
-            cfg.statistics.memory = utils.print_gpu_utilization(0)
+            cfg.statistics.memory = print_gpu_utilization(0)
         if is_eval_epoch(cur_epoch):
             for i in range(1, num_splits):
                 eval_epoch(loggers[i], loaders[i], model,
@@ -215,8 +215,8 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
         run.finish()
         run = None
 
-    total_time_taken = time.time() - t0
-    avg_time_epoch = np.mean(per_epoch_time)
+    total_time_taken = np.sum(full_epoch_times)
+    avg_time_epoch = np.mean(full_epoch_times)
 
     logging.info('Task done, results saved in %s', cfg.run_dir)
 

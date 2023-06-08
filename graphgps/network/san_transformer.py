@@ -44,7 +44,8 @@ class SANTransformer(torch.nn.Module):
                                 dropout=cfg.gt.dropout,
                                 layer_norm=cfg.gt.layer_norm,
                                 batch_norm=cfg.gt.batch_norm,
-                                residual=cfg.gt.residual))
+                                residual=cfg.gt.residual,
+                                use_edge=cfg.gt.use_edge))
         self.trf_layers = torch.nn.Sequential(*layers)
 
         GNNHead = register.head_dict[cfg.gnn.head]

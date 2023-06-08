@@ -144,10 +144,15 @@ If you find this work useful, please cite our NeurIPS 2022 paper:
 
 ## 如何修改
 
+### 关于Configs
 模型相关配置在configs/下进行修改；
 
 训练部分custom，需要在graphgps/下相应部分进行修改；
-尤其是给config文件中加额外词条时，需要分组、名字、数据类型一一对应。
+尤其是给config文件中加额外词条时，需要分组、名字、数据类型一一对应；
 在graphgps/config/中的各种配置文件中，argument group名称唯一。
 
+### 关于TUDataset
+TUDataset中，几乎所有数据集都没有edge attr，因此在选择GPS方法跑时，需要将gt.layer_type设置为GCN/GIN+Transformer，详情可见graphgps/layer/gps_layer.py；
+
+### 关于run code
 script中指定GPU时，使用CUDA_VISIBLE_DEVICES=gpu_ids sh run.sh运行；
