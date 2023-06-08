@@ -207,7 +207,7 @@ def add_graph_token(data, token):
 
 
 class NodeEncoder(torch.nn.Module):
-    def __init__(self, embed_dim, num_in_degree, num_out_degree,
+    def __init__(self, node_features, embed_dim, num_in_degree, num_out_degree,
                  input_dropout=0.0, use_graph_token: bool = True):
         """Implementation of the node encoder of Graphormer.
         This encoder is based on the implementation at:
@@ -215,6 +215,7 @@ class NodeEncoder(torch.nn.Module):
         Note that this refers to v1 of Graphormer.
 
         Args:
+            node_features: The number of node features
             embed_dim: The number of hidden dimensions of the model
             num_in_degree: Maximum size of in-degree to encode
             num_out_degree: Maximum size of out-degree to encode
@@ -222,7 +223,11 @@ class NodeEncoder(torch.nn.Module):
             use_graph_token: If True, adds the graph token to the incoming batch.
         """
         super().__init__()
-        # self.lin_input = torch.nn.Linear(node_features, embed_dim)
+        self.node_features = node_features
+        if node_features > 0:
+            self.node_lin = torch.nn.Linear(node_features, embed_dim)
+            embed_dim = node_features
+
         self.in_degree_encoder = torch.nn.Embedding(num_in_degree, embed_dim)
         self.out_degree_encoder = torch.nn.Embedding(num_out_degree, embed_dim)
 
@@ -243,6 +248,10 @@ class NodeEncoder(torch.nn.Module):
 
         if self.use_graph_token:
             data = add_graph_token(data, self.graph_token)
+
+        if self.node_features > 0:
+            data.x = self.node_lin(data.x)
+
         data.x = self.input_dropout(data.x)
         return data
 
@@ -256,21 +265,40 @@ class NodeEncoder(torch.nn.Module):
 @register_node_encoder("GraphormerBias")
 class GraphormerEncoder(torch.nn.Sequential):
     def __init__(self, dim_emb, *args, **kwargs):
-        encoders = [
-            BiasEncoder(
-                cfg.graphormer.num_heads,
-                cfg.posenc_GraphormerBias.num_spatial_types,
-                cfg.dataset.edge_encoder_num_types,
-                cfg.graphormer.use_graph_token
-            ),
-            NodeEncoder(
-                dim_emb,
-                cfg.posenc_GraphormerBias.num_in_degrees,
-                cfg.posenc_GraphormerBias.num_out_degrees,
-                cfg.graphormer.input_dropout,
-                cfg.graphormer.use_graph_token
-            ),
-        ]
+        if cfg.dataset.format in ["PyG-TUDataset"]:
+            encoders = [
+                BiasEncoder(
+                    cfg.graphormer.num_heads,
+                    cfg.posenc_GraphormerBias.num_spatial_types,
+                    cfg.dataset.edge_encoder_num_types,
+                    cfg.graphormer.use_graph_token
+                ),
+                NodeEncoder(
+                    cfg.dataset.num_node_features,
+                    dim_emb,
+                    cfg.posenc_GraphormerBias.num_in_degrees,
+                    cfg.posenc_GraphormerBias.num_out_degrees,
+                    cfg.graphormer.input_dropout,
+                    cfg.graphormer.use_graph_token
+                ),
+            ]
+        else:
+            encoders = [
+                BiasEncoder(
+                    cfg.graphormer.num_heads,
+                    cfg.posenc_GraphormerBias.num_spatial_types,
+                    cfg.dataset.edge_encoder_num_types,
+                    cfg.graphormer.use_graph_token
+                ),
+                NodeEncoder(
+                    0,
+                    dim_emb,
+                    cfg.posenc_GraphormerBias.num_in_degrees,
+                    cfg.posenc_GraphormerBias.num_out_degrees,
+                    cfg.graphormer.input_dropout,
+                    cfg.graphormer.use_graph_token
+                ),
+            ]
         if cfg.posenc_GraphormerBias.node_degrees_only:  # No attn. bias encoder
             encoders = encoders[1:]
         super().__init__(*encoders)

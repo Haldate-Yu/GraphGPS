@@ -183,6 +183,7 @@ def load_dataset_master(format, name, dataset_dir):
     pre_transform_in_memory(dataset, partial(task_specific_preprocessing, cfg=cfg))
 
     log_loaded_dataset(dataset, format, name)
+    cfg.dataset.num_node_features = dataset.num_node_features
 
     # Precompute necessary statistics for positional encodings.
     pe_enabled_list = []

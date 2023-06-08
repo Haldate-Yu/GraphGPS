@@ -152,7 +152,11 @@ If you find this work useful, please cite our NeurIPS 2022 paper:
 在graphgps/config/中的各种配置文件中，argument group名称唯一。
 
 ### 关于TUDataset
-TUDataset中，几乎所有数据集都没有edge attr，因此在选择GPS方法跑时，需要将gt.layer_type设置为GCN/GIN+Transformer，详情可见graphgps/layer/gps_layer.py；
+[GPSModels]TUDataset中，几乎所有数据集都没有edge attr，因此在选择GPS方法跑时，需要将gt.layer_type设置为GCN/GIN+Transformer，详情可见graphgps/layer/gps_layer.py；
+
+[SAN]SAN_GT模型强制使用数据集中的edge_attr，这是无可避免的，因此为了能让它正常运行，我们为TUDataset设置了fake_edge_attr，详情可见graphgps/layer/san_layer.py或graphgps/layer/san2_layer.py
+
+[Graphormer]暂时不清楚Graphormer是通过怎样的机制来计算data.x + in_encoding + out_encoding(graphgps/encoder/graphormer_encoder.py, line 245)，于是我们为其设置了专门的线性转换，以便于正常运行，详情可见graphgps/encoder/graphormer_encoder.py
 
 ### 关于run code
 script中指定GPU时，使用CUDA_VISIBLE_DEVICES=gpu_ids sh run.sh运行；
