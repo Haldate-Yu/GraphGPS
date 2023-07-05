@@ -4,8 +4,8 @@ homedir=$(dirname $(dirname $(realpath $0)))
 cd $homedir
 
 if [[ $CONDA_DEFAULT_ENV != graphgps ]]; then
-    source ~/.bashrc
-    conda activate graphgps
+  source ~/.bashrc
+  conda activate graphgps
 fi
 
 echo "homdir=${homedir}"
@@ -30,7 +30,7 @@ python main.py --cfg tests/configs/graph/malnettiny-LapPE.yaml run_multiple_spli
 # TUDataset
 python main.py --cfg tests/configs/graph/collab.yaml run_multiple_splits [3]
 python main.py --cfg tests/configs/graph/dd.yaml run_multiple_splits [3]
-python main.py --cfg tests/configs/graph/enzymes.yaml  # run all 10 folds
+python main.py --cfg tests/configs/graph/enzymes.yaml # run all 10 folds
 python main.py --cfg tests/configs/graph/imdb-binary.yaml run_multiple_splits [0,1]
 python main.py --cfg tests/configs/graph/imdb-multi.yaml run_multiple_splits [0,1]
 python main.py --cfg tests/configs/graph/proteins.yaml run_multiple_splits [0,1]
