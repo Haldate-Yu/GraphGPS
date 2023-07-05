@@ -536,7 +536,7 @@ def preformat_TUDataset(dataset_dir, name):
     """
     if name in ['DD', 'NCI1', 'ENZYMES', 'PROTEINS', 'TRIANGLES']:
         func = None
-    elif name.startswith('IMDB-') or name == "COLLAB":
+    elif name.startswith('IMDB-') or name in ["COLLAB", 'REDDIT-BINARY']:
         func = T.Constant()
     else:
         raise ValueError(f"Loading dataset '{name}' from "

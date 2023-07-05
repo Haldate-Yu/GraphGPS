@@ -167,7 +167,7 @@ if __name__ == '__main__':
             total_time, avg_time = train(model, datamodule, logger=True)
         else:
             total_time, avg_time = train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
-                                       scheduler)
+                                                              scheduler)
 
         total_time_list.append(float(total_time))
         avg_time_list.append(float(avg_time))
@@ -180,8 +180,9 @@ if __name__ == '__main__':
     cfg.statistics.avg_time = float(np.mean(avg_time_list))
     cfg.statistics.avg_time_std = float(np.std(avg_time_list))
     try:
-        agg_runs(cfg.out_dir, cfg.metric_best)
         utils.agg_runs_to_csv(cfg, cfg.out_dir, cfg.metric_best)
+        agg_runs(cfg.out_dir, cfg.metric_best)
+
     except Exception as e:
         logging.info(f"Failed when trying to aggregate multiple runs: {e}")
     # When being launched in batch mode, mark a yaml as done
