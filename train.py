@@ -71,6 +71,7 @@ def train(loggers, loaders, model, optimizer, scheduler):
 
     t0 = time.time()
     per_epoch_time = []
+    test_time = []
 
     num_splits = len(loggers)
     for cur_epoch in range(start_epoch, cfg.optim.max_epoch):
@@ -81,7 +82,9 @@ def train(loggers, loaders, model, optimizer, scheduler):
             cfg.statistics.memory = utils.print_gpu_utilization(0)
         if is_eval_epoch(cur_epoch):
             for i in range(1, num_splits):
+                t_eval_start = time.time()
                 eval_epoch(loggers[i], loaders[i], model)
+                test_time.append(time.time() - t_eval_start)
                 loggers[i].write_epoch(cur_epoch)
         if is_ckpt_epoch(cur_epoch):
             save_ckpt(model, optimizer, scheduler, cur_epoch)
@@ -93,7 +96,8 @@ def train(loggers, loaders, model, optimizer, scheduler):
 
     total_time_taken = time.time() - t0
     avg_time_epoch = np.mean(per_epoch_time)
+    avg_test_time = np.mean(test_time)
 
     logging.info('Task done, results saved in {}'.format(cfg.out_dir))
 
-    return total_time_taken, avg_time_epoch
+    return total_time_taken, avg_time_epoch, avg_test_time

@@ -115,6 +115,7 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
 
     t0 = time.time()
     per_epoch_time = []
+    test_time = []
 
     num_splits = len(loggers)
     split_names = ['val', 'test']
@@ -129,8 +130,10 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
             cfg.statistics.memory = print_gpu_utilization(0)
         if is_eval_epoch(cur_epoch):
             for i in range(1, num_splits):
+                t_test_time_start = time.time()
                 eval_epoch(loggers[i], loaders[i], model,
                            split=split_names[i - 1])
+                test_time.append(time.time() - t_test_time_start)
                 perf[i].append(loggers[i].write_epoch(cur_epoch))
         else:
             for i in range(1, num_splits):
@@ -217,10 +220,11 @@ def custom_train(loggers, loaders, model, optimizer, scheduler):
 
     total_time_taken = np.sum(full_epoch_times)
     avg_time_epoch = np.mean(full_epoch_times)
+    avg_test_time = np.mean(test_time)
 
     logging.info('Task done, results saved in %s', cfg.run_dir)
 
-    return total_time_taken, avg_time_epoch
+    return total_time_taken, avg_time_epoch, avg_test_time
 
 
 @register_train('inference-only')

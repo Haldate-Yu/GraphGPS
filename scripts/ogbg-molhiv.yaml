@@ -1,4 +1,4 @@
-out_dir: tests/results
+out_dir: ./results
 metric_best: auc
 dataset:
   format: OGB
@@ -37,3 +37,11 @@ optim:
   optimizer: adam
   base_lr: 0.01
   max_epoch: 100
+statistics:
+  memory: 0
+  total_time: 0.0
+  total_time_std: 0.0
+  avg_time: 0.0
+  avg_time_std: 0.0
+  test_time: 0.0
+  test_time_std: 0.0

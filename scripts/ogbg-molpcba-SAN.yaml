@@ -1,4 +1,4 @@
-out_dir: tests/results
+out_dir: ./results
 metric_best: ap
 dataset:
   format: OGB
@@ -63,3 +63,11 @@ optim:
   reduce_factor: 0.5
   schedule_patience: 20
   min_lr: 1e-5
+statistics:
+  memory: 0
+  total_time: 0.0
+  total_time_std: 0.0
+  avg_time: 0.0
+  avg_time_std: 0.0
+  test_time: 0.0
+  test_time_std: 0.0

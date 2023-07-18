@@ -126,7 +126,7 @@ if __name__ == '__main__':
     # Set Pytorch environment
     torch.set_num_threads(cfg.num_threads)
     # Repeat for multiple experiment runs
-    total_time_list, avg_time_list = [], []
+    total_time_list, avg_time_list, test_time_list = [], [], []
     for run_id, seed, split_index in zip(*run_loop_settings()):
         # Set configurations for each run
         custom_set_run_dir(cfg, run_id)
@@ -164,13 +164,14 @@ if __name__ == '__main__':
                 logging.warning("[W] WandB logging is not supported with the "
                                 "default train.mode, set it to `custom`")
             datamodule = GraphGymDataModule()
-            total_time, avg_time = train(model, datamodule, logger=True)
+            total_time, avg_time, avg_test_time = train(model, datamodule, logger=True)
         else:
-            total_time, avg_time = train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
-                                                              scheduler)
+            total_time, avg_time, avg_test_time = train_dict[cfg.train.mode](loggers, loaders, model, optimizer,
+                                                                             scheduler)
 
         total_time_list.append(float(total_time))
         avg_time_list.append(float(avg_time))
+        test_time_list.append(float(avg_test_time))
     # Aggregate results from different seeds
     total_time_list = np.array(total_time_list)
     avg_time_list = np.array(avg_time_list)
@@ -179,6 +180,8 @@ if __name__ == '__main__':
     cfg.statistics.total_time_std = float(np.std(total_time_list))
     cfg.statistics.avg_time = float(np.mean(avg_time_list))
     cfg.statistics.avg_time_std = float(np.std(avg_time_list))
+    cfg.statistics.test_time = float(np.mean(test_time_list))
+    cfg.statistics.test_time_std = float(np.std(test_time_list))
     try:
         utils.agg_runs_to_csv(cfg, cfg.out_dir, cfg.metric_best)
         agg_runs(cfg.out_dir, cfg.metric_best)

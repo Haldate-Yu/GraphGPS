@@ -1,4 +1,4 @@
-out_dir: tests/results
+out_dir: ./results
 metric_best: ap
 wandb:
   use: True
@@ -64,3 +64,11 @@ optim:
   max_epoch: 200
   scheduler: cosine_with_warmup
   num_warmup_epochs: 5
+statistics:
+  memory: 0
+  total_time: 0.0
+  total_time_std: 0.0
+  avg_time: 0.0
+  avg_time_std: 0.0
+  test_time: 0.0
+  test_time_std: 0.0

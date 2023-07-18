@@ -44,3 +44,5 @@ statistics:
   total_time_std: 0.0
   avg_time: 0.0
   avg_time_std: 0.0
+  test_time: 0.0
+  test_time_std: 0.0

@@ -26,7 +26,7 @@ dataset=IMDB-BINARY
 for batch_size in 128; do
   for hidden in 64 128; do
     for head in 4 8; do
-      CUDA_VISIBLE_DEVICES=$cuda python main.py --cfg scripts/enzymes-GPSwLPE.yaml dataset.name $dataset train.batch_size $batch_size gt.dim_hidden $hidden gnn.dim_inner $hidden gt.n_heads $head --repeat 10 wandb.use False
+      CUDA_VISIBLE_DEVICES=$cuda python main.py --cfg scripts/enzymes-GPSwLPE.yaml dataset.name $dataset train.batch_size $batch_size gt.dim_hidden $hidden gnn.dim_inner $hidden gt.n_heads $head wandb.use False
     done
   done
 done
@@ -35,7 +35,7 @@ done
 for batch_size in 128; do
   for hidden in 80 128; do
     for head in 8; do
-      CUDA_VISIBLE_DEVICES=$cuda python main.py --cfg scripts/enzymes-Graphormer.yaml dataset.name $dataset train.batch_size $batch_size gt.dim_hidden $hidden gnn.dim_inner $hidden gt.n_heads $head --repeat 10 wandb.use False
+      CUDA_VISIBLE_DEVICES=$cuda python main.py --cfg scripts/enzymes-Graphormer.yaml dataset.name $dataset train.batch_size $batch_size gt.dim_hidden $hidden gnn.dim_inner $hidden gt.n_heads $head wandb.use False
     done
   done
 done
@@ -44,7 +44,7 @@ done
 for batch_size in 128; do
   for hidden in 64 128; do
     for head in 4 8; do
-      CUDA_VISIBLE_DEVICES=$cuda python main.py --cfg scripts/enzymes-SAN.yaml dataset.name $dataset train.batch_size $batch_size gt.dim_hidden $hidden gnn.dim_inner $hidden gt.n_heads $head --repeat 10 wandb.use False
+      CUDA_VISIBLE_DEVICES=$cuda python main.py --cfg scripts/enzymes-SAN.yaml dataset.name $dataset train.batch_size $batch_size gt.dim_hidden $hidden gnn.dim_inner $hidden gt.n_heads $head wandb.use False
     done
   done
 done

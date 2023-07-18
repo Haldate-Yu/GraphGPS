@@ -169,7 +169,8 @@ def agg_runs_to_csv(cfg, dir, metric_best='auto'):
                   "test_acc", "test_std",
 
                   "total_time", "total_time_std",
-                  "avg_time", "avg_time_std"]
+                  "avg_time", "avg_time_std",
+                  "test_time", "test_time_std"]
 
     with open(filename, "a+") as f:
 
@@ -182,12 +183,15 @@ def agg_runs_to_csv(cfg, dir, metric_best='auto'):
                                 fieldnames=headerList)
             dw.writeheader()
 
-        line = "{}, {}, {}, {}, {}, {}, {}, :::::::::, {:.4f}, {:.4f}, {:.4f}, {:.4f}, {:.4f}, {:.4f}\n".format(
+        line = "{}, {}, {}, {}, {}, {}, {}, :::::::::, {:.4f}, {:.4f}, {:.4f}, {:.4f}, {:.4f}, {:.4f}, {:.4f}, {:.4f}\n".format(
             cfg.model.type, cfg.gt.n_heads, cfg.train.batch_size,
             cfg.gt.layers, cfg.gt.dim_hidden,
             test_best_results['params'], cfg.statistics.memory,
             test_best_results['accuracy'], test_best_results['accuracy_std'],
             cfg.statistics.total_time, cfg.statistics.total_time_std,
-            cfg.statistics.avg_time, cfg.statistics.avg_time_std
+            cfg.statistics.avg_time, cfg.statistics.avg_time_std,
+            cfg.statistics.test_time, cfg.statistics.test_time_std
         )
         f.write(line)
+    print("=" * 20)
+    print("Writing Results File Done !!!")
